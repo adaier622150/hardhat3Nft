@@ -11,17 +11,29 @@ contract MetaNFTAuction is Initializable {
     address admin;
     mapping(address => address) public tokenToOracle;
 
+    //拍卖实体
     struct Auction {
+        //拍卖的NFT地址 
         IERC721 nft;
+        //拍卖的NFT唯一tokenId
         uint256 nftId;
+        //卖家
         address payable seller;
+        //开始时间
         uint256 startingTime;
+        //最高出价者
         address highestBidder;
+        //起始价格（美元）
         uint256 startingPriceInDollar;
+        //持续时间
         uint256 duration;
+        //支付凭证
         IERC20 paymentToken;
+        //最高出价
         uint256 highestBid;
+        //最高美元出价
         uint256 highestBidInDollar;
+        //最高出价代币
         address highestBidToken;
     }
     mapping(uint256 => Auction) public auctions;

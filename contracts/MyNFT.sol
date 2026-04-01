@@ -3,10 +3,10 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract MetaNFT is ERC721 {
+contract MyNFT is ERC721 {
     uint256 private _nextId = 1;
 
-    constructor() ERC721("MetaNFT", "MFT") {
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {
     }
 
     function mint(address to, uint256 id) external {
