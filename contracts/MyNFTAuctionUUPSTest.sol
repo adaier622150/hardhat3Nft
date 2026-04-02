@@ -2,19 +2,19 @@
 pragma solidity 0.8.28;
 
 import "forge-std/Test.sol";
-import "../contracts/MetaNFTAuctionUUPS.sol";
-import "../contracts/MetaNFTAuctionUUPS_V2.sol";
-import "../contracts/MetaNFT.sol";
+import "../contracts/MyNFTAuctionUUPS.sol";
+import "../contracts/MyNFTAuctionUUPS_V2.sol";
+import "../contracts/MyNFT.sol";
 import "../contracts/MockERC20.sol";
 import "../contracts/MockOracle.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract MetaNFTAuctionUUPSTest is Test {
-    MetaNFTAuctionUUPS public auction;
-    MetaNFTAuctionUUPS_V2 public auctionV2;
-    MetaNFT public nft;
+contract MyNFTAuctionUUPSTest is Test {
+    MyNFTAuctionUUPS public auction;
+    MyNFTAuctionUUPS_V2 public auctionV2;
+    MyNFT public nft;
     MockERC20 public usdc;
     MockOracle public ethOracle;
     MockOracle public usdcOracle;
@@ -25,18 +25,18 @@ contract MetaNFTAuctionUUPSTest is Test {
     address public bidder2 = address(0x4);
     
     function setUp() public {
-        MetaNFTAuctionUUPS implementation = new MetaNFTAuctionUUPS();
+        MyNFTAuctionUUPS implementation = new MyNFTAuctionUUPS();
         
-        bytes memory initData = abi.encodeCall(MetaNFTAuctionUUPS.initialize, (admin));
+        bytes memory initData = abi.encodeCall(MyNFTAuctionUUPS.initialize, (admin));
         
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
             initData
         );
         
-        auction = MetaNFTAuctionUUPS(address(proxy));
+        auction = MyNFTAuctionUUPS(address(proxy));
         
-        nft = new MetaNFT();
+        nft = new MyNFT();
         usdc = new MockERC20("USDC", "USDC", 6, 1000000e6);
         
         ethOracle = new MockOracle(3000e8);
@@ -62,7 +62,7 @@ contract MetaNFTAuctionUUPSTest is Test {
 
     function test_initialize() public {
         assertEq(auction.owner(), admin);
-        assertEq(auction.getVersion(), "MetaNFTAuctionUUPS V1");
+        assertEq(auction.getVersion(), "MyNFTAuctionUUPS V1");
     }
 
     function test_initializeCannotBeCalledTwice() public {
@@ -80,7 +80,7 @@ contract MetaNFTAuctionUUPSTest is Test {
 
     function test_setTokenOracleOnlyOwner() public {
         vm.startPrank(seller);
-        vm.expectRevert(abi.encodeWithSelector(MetaNFTAuctionUUPS.OwnableUnauthorizedAccount.selector, seller));
+        vm.expectRevert(abi.encodeWithSelector(MyNFTAuctionUUPS.OwnableUnauthorizedAccount.selector, seller));
         auction.setTokenOracle(address(0), address(0x123));
         vm.stopPrank();
     }
@@ -120,7 +120,7 @@ contract MetaNFTAuctionUUPSTest is Test {
 
     function test_startAuctionOnlyOwner() public {
         vm.startPrank(seller);
-        vm.expectRevert(abi.encodeWithSelector(MetaNFTAuctionUUPS.OwnableUnauthorizedAccount.selector, seller));
+        vm.expectRevert(abi.encodeWithSelector(MyNFTAuctionUUPS.OwnableUnauthorizedAccount.selector, seller));
         auction.start(seller, 1, address(nft), 1000, 3600, address(usdc));
         vm.stopPrank();
     }
@@ -215,24 +215,24 @@ contract MetaNFTAuctionUUPSTest is Test {
         uint256 oldAuctionId = auction.auctionId();
         vm.stopPrank();
         
-        MetaNFTAuctionUUPS_V2 newImplementation = new MetaNFTAuctionUUPS_V2();
+        MyNFTAuctionUUPS_V2 newImplementation = new MyNFTAuctionUUPS_V2();
         
         vm.startPrank(admin);
         auction.upgradeToAndCall(address(newImplementation), "");
         vm.stopPrank();
         
-        auctionV2 = MetaNFTAuctionUUPS_V2(address(auction));
+        auctionV2 = MyNFTAuctionUUPS_V2(address(auction));
         
         assertEq(auctionV2.auctionId(), oldAuctionId);
-        assertEq(auctionV2.getVersion(), "MetaNFTAuctionUUPS V2");
+        assertEq(auctionV2.getVersion(), "MyNFTAuctionUUPS V2");
         assertEq(auctionV2.newFeature(), "This is a new feature in UUPS V2");
     }
 
     function test_upgradeOnlyOwner() public {
-        MetaNFTAuctionUUPS_V2 newImplementation = new MetaNFTAuctionUUPS_V2();
+        MyNFTAuctionUUPS_V2 newImplementation = new MyNFTAuctionUUPS_V2();
         
         vm.startPrank(seller);
-        vm.expectRevert(abi.encodeWithSelector(MetaNFTAuctionUUPS.OwnableUnauthorizedAccount.selector, seller));
+        vm.expectRevert(abi.encodeWithSelector(MyNFTAuctionUUPS.OwnableUnauthorizedAccount.selector, seller));
         auction.upgradeToAndCall(address(newImplementation), "");
         vm.stopPrank();
     }
@@ -242,12 +242,12 @@ contract MetaNFTAuctionUUPSTest is Test {
         auction.start(seller, 1, address(nft), 1000, 3600, address(usdc));
         vm.stopPrank();
         
-        MetaNFTAuctionUUPS_V2 newImplementation = new MetaNFTAuctionUUPS_V2();
+        MyNFTAuctionUUPS_V2 newImplementation = new MyNFTAuctionUUPS_V2();
         
         vm.startPrank(admin);
         auction.upgradeToAndCall(address(newImplementation), "");
         
-        auctionV2 = MetaNFTAuctionUUPS_V2(address(auction));
+        auctionV2 = MyNFTAuctionUUPS_V2(address(auction));
         
         MockOracle newEthOracle = new MockOracle(4000e8);
         auctionV2.setTokenOracle(address(0), address(newEthOracle));
