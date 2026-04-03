@@ -19,6 +19,9 @@ contract MyNFT is ERC721 {
         _nextId++;
         return id;
     }
+    function nextId()  public view  returns (uint256) {
+        return _nextId;
+    }
 
     function burn(uint256 id) external {
         require(msg.sender == ownerOf(id), "not owner");

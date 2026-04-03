@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import "./MyNFTAuctionUUPS.sol";
+import "./MyNFTAuction.sol";
 
-contract MyNFTAuctionUUPS_V2 is MyNFTAuctionUUPS {
+contract MyNFTAuction_V2 is MyNFTAuction {
     function getVersion() external pure override returns (string memory) {
-        return "MyNFTAuctionUUPS V2";
+        return "MyNFTAuction V2";
     }
 
     function newFeature() external pure returns (string memory) {
-        return "This is a new feature in UUPS V2";
+        return "This is a new feature in  V2";
     }
 }

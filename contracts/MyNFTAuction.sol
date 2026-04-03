@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
-contract MyNFTAuctionUUPS is Initializable, UUPSUpgradeable {
+contract MyNFTAuction is Initializable, UUPSUpgradeable {
     address private _owner;
     mapping(address => address) public tokenToOracle;
 
@@ -146,7 +146,7 @@ contract MyNFTAuctionUUPS is Initializable, UUPSUpgradeable {
         auction.highestBidToken = address(auction.paymentToken);
         auction.highestBidder = msg.sender;
         auction.highestBidInDollar = bidPrice;
-        emit BidErc(sender, amount);(msg.sender, amount);
+        emit BidErc(msg.sender, amount);
     }
     // 退回未中标
     function _returnUnsuccessfulBids(Auction storage auction) internal {
@@ -205,6 +205,6 @@ contract MyNFTAuctionUUPS is Initializable, UUPSUpgradeable {
     }
     
     function getVersion() external pure virtual returns (string memory) {
-        return "MyNFTAuctionUUPS V1";
+        return "MyNFTAuction V1";
     }
 }
