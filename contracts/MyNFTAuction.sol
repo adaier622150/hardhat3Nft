@@ -204,7 +204,12 @@ contract MyNFTAuction is Initializable, UUPSUpgradeable {
         return usd;
     }
     
-    function getVersion() external pure virtual returns (string memory) {
+    // 转换美元
+    function convertToUSD(uint256 amount, address token) public view returns (uint256) {
+        return _convertToUSD(amount, token);
+    }
+    // 获取当前版本
+    function getVersion() public pure virtual returns (string memory) {
         return "MyNFTAuction V1";
     }
 }

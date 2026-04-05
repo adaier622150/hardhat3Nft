@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import "./MyNFTAuction.sol";
 
 contract MyNFTAuction_V2 is MyNFTAuction {
-    function getVersion() external pure override returns (string memory) {
+    function getVersion() public pure override returns (string memory) {
         return "MyNFTAuction V2";
     }
 

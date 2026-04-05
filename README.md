@@ -52,20 +52,21 @@ PRIVATE_KEY=0x你的私钥
 
 | 合约 | 说明 |
 |------|------|
-| `MetaNFTAuction.sol` | 主拍卖合约，实现拍卖逻辑 |
-| `MetaNFTAuctionV2.sol` | 升级版拍卖合约，演示升级功能 |
-| `MetaNFT.sol` | NFT 合约，用于测试 |
-| `MockERC20.sol` | ERC20 测试代币合约 |
-| `MockOracle.sol` | Chainlink 价格预言机 Mock 合约 |
+| `MyNFTAuction.sol` | 主拍卖合约，实现拍卖逻辑 |
+| `MyNFTAuction_V2.sol` | 升级版拍卖合约，演示升级功能 |
+| `MyNFT.sol` | NFT 合约，用于测试 |
+| `MyERC20.sol` | ERC20 测试代币合约 |
+| `MyOracle.sol` | Chainlink 价格预言机 Mock 合约 |
 
 ### 主要功能
 
-#### MetaNFTAuction
+#### MyNFTAuction
 
 - `initialize(address admin)`: 初始化合约
 - `setTokenOracle(address token, address oracle)`: 设置代币价格预言机
 - `start(...)`: 发起拍卖
-- `bid(uint256 auctionId, uint256 amount)`: 出价（支持 ETH 和 ERC20）
+- `placeEthBid(uint256 auctionId, uint256 amount)`: 出价ETH
+- `placeErc20Bid(uint256 auctionId, uint256 amount)`: 出价ERC20
 - `end(uint256 auctionId)`: 结束拍卖
 - `getPriceInDollar(address token)`: 获取代币美元价格
 - `isEnded(uint256 auctionId)`: 查询拍卖是否结束
@@ -81,28 +82,18 @@ npx hardhat compile
 # 运行 Solidity 测试
 npx hardhat test
 
-# 运行 Ethers.js 测试
-npx hardhat test test/MetaNFTAuction.ethers.ts
-
-# 运行 Viem 测试
-npx hardhat test test/MetaNFTAuction.viem.ts
-
-# 运行所有测试
-npx hardhat test test/MetaNFTAuction.ethers.ts test/MetaNFTAuction.viem.ts
-```
 
 ### 测试覆盖
 
 测试用例覆盖以下功能：
 
 - ✅ 合约版本验证
-- ✅ 价格查询功能
+- ✅ 合约升级功能
+- ✅ 转让所有权
 - ✅ 初始化权限控制
 - ✅ 拍卖启动流程
 - ✅ 出价验证（时间、金额）
 - ✅ 拍卖结束逻辑
-- ✅ 合约升级功能
-- ✅ 升级后功能验证
 
 ## 🚀 部署
 
@@ -115,14 +106,14 @@ npx hardhat test test/MetaNFTAuction.ethers.ts test/MetaNFTAuction.viem.ts
 npx hardhat node
 
 # 在新终端部署合约
-npx hardhat ignition deploy ignition/modules/MetaNFTAuctionProxyModule.ts --network localhost
+npx hardhat ignition deploy ignition/modules/MyNFTAuctionProxyModule.ts --network localhost
 ```
 
 ### 测试网部署
 
 ```bash
 # 配置 hardhat.config.ts 中的网络信息
-npx hardhat ignition deploy ignition/modules/MetaNFTAuctionProxyModule.ts --network sepolia
+npx hardhat ignition deploy ignition/modules/MyNFTAuctionProxyModule.ts --network sepolia
 ```
 
 ### 部署模块说明
@@ -131,34 +122,32 @@ npx hardhat ignition deploy ignition/modules/MetaNFTAuctionProxyModule.ts --netw
 
 | 模块 | 说明 |
 |------|------|
-| `MetaNFTAuctionProxyModule.ts` | 部署拍卖合约（透明代理模式） |
-| `MetaNFTAuctionUpgradeModule.ts` | 升级拍卖合约到 V2 版本 |
-| `MetaNFT.ts` | 部署 NFT 合约 |
-| `MetaNFTAuction.ts` | 部署拍卖合约（无代理） |
-| `MetaNFTAuctionV2.ts` | 部署升级版拍卖合约 |
+| `MyNFTAuctionProxyModule.ts` | 部署拍卖合约（UUPS代理模式） |
+| `MyNFTAuctionUpgradeModule.ts` | 升级拍卖合约到 V2 版本 |
+| `MyNFT.ts` | 部署 NFT 合约 |
+| `MyNFTAuction.ts` | 部署拍卖合约（无代理） |
 
 ### 部署流程
 
-**首次部署（透明代理模式）：**
+**首次部署（UUPS代理模式）：**
 
 ```bash
-npx hardhat ignition deploy ignition/modules/MetaNFTAuctionProxyModule.ts --network <network-name>
+npx hardhat ignition deploy ignition/modules/MyNFTAuctionProxyModule.ts --network <network-name>
 ```
 
 这将部署：
-1. MetaNFTAuction 实现合约
+1. MyNFTAuction 实现合约
 2. TransparentUpgradeableProxy 代理合约
-3. ProxyAdmin 管理合约
 
 **合约升级：**
 
 ```bash
-npx hardhat ignition deploy ignition/modules/MetaNFTAuctionUpgradeModule.ts --network <network-name>
+npx hardhat ignition deploy ignition/modules/MyNFTAuctionUpgradeModule.ts --network <network-name>
 ```
 
 这将：
-1. 部署新的 MetaNFTAuctionV2 实现合约
-2. 通过 ProxyAdmin 升级代理指向新实现
+1. 部署新的 MyNFTAuction_V2 实现合约
+2. 通过 MyNFTAuction 升级代理指向新实现
 
 ### 查看部署信息
 
@@ -167,22 +156,6 @@ npx hardhat ignition deploy ignition/modules/MetaNFTAuctionUpgradeModule.ts --ne
 - `artifacts/` - 合约 artifacts
 - `journal.jsonl` - 部署日志
 
-## 💻 交互脚本
-
-项目提供了两个交互脚本示例，分别使用 Ethers.js 和 Viem：
-
-### Ethers.js 版本
-
-```bash
-npx hardhat run scripts/interact.ethers.ts
-```
-
-### Viem 版本
-
-```bash
-npx hardhat run scripts/interact.viem.ts
-```
-
 ### 功能特性
 
 - 查询合约状态（版本、拍卖ID、拍卖详情等）
@@ -190,7 +163,6 @@ npx hardhat run scripts/interact.viem.ts
 - 事件监听示例
 - 完整的错误处理
 
-详细使用说明请参考 [scripts/README.md](scripts/README.md)
 
 ## 🔄 合约升级
 
@@ -213,22 +185,20 @@ npx hardhat run scripts/interact.viem.ts
 ## 📁 项目结构
 
 ```
-nft-auction-demo/
-├── contracts/              # 智能合约
-│   ├── MetaNFTAuction.sol
-│   ├── MetaNFTAuctionV2.sol
-│   ├── MetaNFT.sol
-│   ├── MockERC20.sol
-│   └── MockOracle.sol
-├── test/                   # 测试文件
-│   ├── MetaNFTAuction.t.sol      # Solidity 测试
-│   ├── MetaNFTAuction.ethers.ts  # Ethers.js 测试
-│   └── MetaNFTAuction.viem.ts    # Viem 测试
-├── scripts/                # 脚本
-│   ├── interact.ethers.ts  # Ethers.js 交互脚本
-│   ├── interact.viem.ts    # Viem 交互脚本
-│   └── README.md           # 脚本使用说明
-├── hardhat.config.ts       # Hardhat 配置
+hardhat3Nft/
+├── contracts/                # 智能合约
+│   ├── MyNFTAuction.sol
+│   ├── MyNFTAuctionV2.sol
+│   ├── MyNFT.sol
+│   ├── MyERC20.sol
+│   └── MyOracle.sol
+├── ignition/                 # Ignition部署模块
+├── test/                     # 测试文件
+│   ├── MyNFTAuction.test.ts  # Solidity 测试
+│   ├── MyNFT.test.ts         
+│   ├── MyERC20.test.ts       
+│   ├── MyOracle.test.ts      
+├── hardhat.config.ts         # Hardhat 配置
 ├── package.json
 └── README.md
 ```

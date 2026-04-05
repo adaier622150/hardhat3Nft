@@ -42,4 +42,17 @@ describe("MyNFT", function () {
     expect(tokenId).to.equal(2);
     expect(balance).to.equal(1);
   });
+
+  
+  // 测试用例
+  it("Should mint ", async function () {
+    const { myNFT, owner, addr1, addr2 } = await networkHelpers.loadFixture(deployMyNFTFixture);
+    const tokenId = 1n;
+    await myNFT.mint(owner,tokenId);
+
+    const user = await myNFT.ownerOf(tokenId);
+    console.log("user ", user);
+    console.log("owner ", owner);
+    expect(user).to.equal(owner);
+  });
 });
